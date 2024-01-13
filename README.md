@@ -1,0 +1,1 @@
+# AIS-ADAPTER-1-ESPHome
