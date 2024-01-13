@@ -1,0 +1,81 @@
+# GPIO15 LedLink (red led)
+# GPIO14 Led_i 1 (green led)
+# GPIO16 ETH POWER
+# GPIO18 ETH MDIO
+# GPIO23 ETH MDC
+# GPIO34 Button 1
+# GPIO12 Zigbee RST 2
+# GPIO13 Zigbee RST 1
+# GPIO02 Zigbee Tx
+# GPIO04 Zigbee Rx
+# GPIO32 I2C SCL 1
+# GPIO33 I2C SDA 1
+
+substitutions:
+  name: ais-adapter-1
+
+esphome:
+  name: ${name}
+  comment: ${device_description}
+  project:
+    name: "ais.ais-adapter-1-esphome"
+    version: 2.0.1
+  on_boot:
+    priority: 600
+    then:
+      - switch.turn_off: download_mode
+      - switch.turn_on: zigbee_reset
+
+esp32:
+  board: esp-wrover-kit
+  framework:
+    type: esp-idf
+
+external_components:
+  - source: github://oxan/esphome-stream-server@master
+
+ota:
+
+logger:
+  level: DEBUG
+
+api:
+
+uart:
+  id: uart_zigbee
+  rx_pin: GPIO4
+  tx_pin: GPIO2
+  baud_rate: 115200
+
+stream_server:
+  uart_id: uart_zigbee
+  port: 6638
+
+switch:
+  - platform: restart
+    name: "${name} Restart"
+
+  - platform: template
+    id: zigbee_reset
+    name: "${name} Zigbee Reset"
+    turn_on_action:
+      - switch.turn_on: zigbee_rst
+      - delay: 10ms
+      - switch.turn_off: zigbee_rst
+
+  # SM-011 V1.0 nRST
+  - platform: gpio
+    id: zigbee_rst
+    pin: GPIO13
+    name: "${name} Zigbee nRST"
+    inverted: true
+    internal: true
+    restore_mode: ALWAYS_OFF
+
+  # SM-011 V1.0 PA00
+  - platform: gpio
+    id: download_mode
+    pin: GPIO12
+    name: "${name} Zigbee Download Mode"
+    inverted: true
+    restore_mode: ALWAYS_OFF
