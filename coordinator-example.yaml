@@ -4,7 +4,7 @@ substitutions:
 
 packages:
   ais-adapter-1:
-    url: https://github.com/svieteAIS-ADAPTER-1-ESPHome
+    url: https://github.com/sviete/AIS-ADAPTER-1-ESPHome
     ref: main
     files:
       - packages/core.yaml
